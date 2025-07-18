@@ -13,15 +13,10 @@ const main = async () => {
   console.log(INFO, `Found ${portfolios.length} portfolios`);
 
   const portfoliosWithFunds = portfolios.filter(({ funds }) => {
-    if (
-      funds.length === 2 &&
-      funds[0].id === "cash" &&
-      funds[1].id === "cash"
-    ) {
-      return false;
-    }
-
-    return true;
+    // Filtrar portfolios que tengan al menos uno de los fondos globalCash o globalCashPEN
+    return funds.some(
+      (fund: any) => fund.id === "globalCash" || fund.id === "globalCashPEN"
+    );
   });
 
   console.log(
@@ -47,23 +42,36 @@ const main = async () => {
       let needUpdatePortfolio = false;
       const newPortfoliosFunds = await Promise.all(
         currentPortfolio.funds.map(async (portfolioFund: any) => {
-          if (portfolioFund.id === "cash") {
+          // Si el fondo no es globalCash o globalCashPEN, devolverlo sin procesar
+          if (
+            portfolioFund.id !== "globalCash" &&
+            portfolioFund.id !== "globalCashPEN"
+          ) {
             return portfolioFund;
           }
 
           if (portfolioFund.creationDate) {
-            // console.log(
-            //   OK,
-            //   `Portfolio fund ${portfolioFund.id} ${portfolioFund.series} already has creationDate`
-            // );
-
             return portfolioFund;
           }
 
-          // SERIES_O === NO_SERIES
+          // SERIES_O === NO_SERIES - considerar equivalencia para transacciones antiguas
           const fundTransactions = allTransactions.filter(
-            ({ fund: { id, series } }) =>
-              id === portfolioFund.id && series === portfolioFund.series
+            ({ fund: { id, series } }) => {
+              if (id !== portfolioFund.id) return false;
+
+              // Si el portfolio tiene NO_SERIES, buscar tanto NO_SERIES como SERIES_O
+              if (portfolioFund.series === "NO_SERIES") {
+                return series === "NO_SERIES" || series === "SERIES_O";
+              }
+
+              // Si el portfolio tiene SERIES_O, buscar tanto SERIES_O como NO_SERIES
+              if (portfolioFund.series === "SERIES_O") {
+                return series === "SERIES_O" || series === "NO_SERIES";
+              }
+
+              // Para otras series, buscar exactamente la misma
+              return series === portfolioFund.series;
+            }
           );
 
           console.log(
