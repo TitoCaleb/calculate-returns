@@ -54,7 +54,12 @@ const main = async () => {
             return portfolioFund;
           }
 
-          if (portfolioFund?.creationDate) {
+          // Si el fondo tiene SERIES_A, omitirlo ya que es una serie nueva
+          if (portfolioFund?.series === "SERIES_A") {
+            console.log(
+              INFO,
+              `Skipping fund ${portfolioFund?.id} with SERIES_A (new series)`
+            );
             return portfolioFund;
           }
 
@@ -119,20 +124,48 @@ const main = async () => {
             return portfolioFund;
           }
 
+          const correctCreationDate = transactionForCreationDate.priceDate;
+          const currentCreationDate = portfolioFund?.creationDate;
+
           console.log(
             INFO,
-            `found priceDate ${new Date(
-              transactionForCreationDate?.priceDate
+            `Found correct creationDate ${new Date(
+              correctCreationDate
             ).toISOString()} for fund ${portfolioFund?.id} and series ${
               portfolioFund?.series
             }`
           );
 
-          needUpdatePortfolio = true;
-          return {
-            ...portfolioFund,
-            creationDate: transactionForCreationDate.priceDate,
-          };
+          if (currentCreationDate) {
+            console.log(
+              INFO,
+              `Current creationDate: ${currentCreationDate}, Correct creationDate: ${correctCreationDate}}`
+            );
+          }
+
+          // Solo actualizar si no tiene creationDate o si la fecha correcta es diferente
+          if (
+            !currentCreationDate ||
+            currentCreationDate !== correctCreationDate
+          ) {
+            needUpdatePortfolio = true;
+            console.log(
+              INFO,
+              `Updating creationDate for fund ${portfolioFund?.id} from ${
+                currentCreationDate ? currentCreationDate : "none"
+              } to ${correctCreationDate}`
+            );
+            return {
+              ...portfolioFund,
+              creationDate: correctCreationDate,
+            };
+          } else {
+            console.log(
+              INFO,
+              `Fund ${portfolioFund?.id} already has correct creationDate: ${currentCreationDate}`
+            );
+            return portfolioFund;
+          }
         })
       );
 
@@ -146,14 +179,19 @@ const main = async () => {
         count++;
         console.log(DONE, `Updated portfolio ${currentPortfolio?.id}`);
       } else {
-        /* console.log(
+        console.log(
           WARN,
           `Portfolio ${currentPortfolio?.id} does not need update`
-        ); */
+        );
       }
     })
   );
   console.log(INFO, `Updated  ${count} portfolios`);
+  console.log(
+    INFO,
+    `No Updated ${portfoliosWithFunds.length - count} portfolios`
+  );
+  console.log(INFO, `Total portfolios: ${portfoliosWithFunds.length}`);
 };
 
 main();
