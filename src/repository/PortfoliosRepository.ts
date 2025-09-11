@@ -1,12 +1,18 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
 import { config } from "../config";
+import { fromIni } from "@aws-sdk/credential-providers";
 
-const dynamoDbClient = DynamoDBDocumentClient.from(new DynamoDBClient({}), {
-  marshallOptions: {
-    removeUndefinedValues: true,
-  },
-});
+const dynamoDbClient = DynamoDBDocumentClient.from(
+  new DynamoDBClient({
+    credentials: fromIni({ profile: "blum" }),
+  }),
+  {
+    marshallOptions: {
+      removeUndefinedValues: true,
+    },
+  }
+);
 
 export const getAllPortfolios = async () => {
   let lastEvaluatedKey: any = undefined;

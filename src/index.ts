@@ -4,19 +4,23 @@ import { DONE, ERR, INFO, WARN } from "./utils/customLogs";
 
 const main = async () => {
   const portfolios = await getAllPortfolios();
-  // const portfolio = await getPortfolio({
-  //   customerId: "692fa6df-8908-4d80-987d-8f5ff1745839",
-  //   id: "e4d39597-373c-441f-9587-7f076b69474d",
-  // });
-  // const portfolios = [portfolio] as Portfolio[];
 
   console.log(INFO, `Found ${portfolios.length} portfolios`);
 
-  const portfoliosWithFunds = portfolios.filter(({ funds }) => {
+  const portfoliosWithFunds = portfolios.filter((portfolio) => {
+    const { funds } = portfolio;
+
+    // Verificar que funds existe y es un array
+    if (!funds || !Array.isArray(funds)) {
+      return false;
+    }
+
     // Filtrar portfolios que tengan al menos uno de los fondos globalCash o globalCashPEN
-    return funds.some(
+    const hasTargetFund = funds.some(
       (fund: any) => fund?.id === "globalCash" || fund?.id === "globalCashPEN"
     );
+
+    return hasTargetFund;
   });
 
   console.log(

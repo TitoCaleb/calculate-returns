@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "co:login": "aws codeartifact login --tool npm --repository theshire --domain rivendell --profile blum"
   },
   "keywords": [],
   "author": "",
@@ -11,6 +12,7 @@
   "description": "",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.840.0",
+    "@aws-sdk/credential-providers": "^3.886.0",
     "@aws-sdk/lib-dynamodb": "^3.840.0",
     "@hapi/boom": "^10.0.1",
     "typescript": "^5.8.3"
