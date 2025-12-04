@@ -1,4 +1,7 @@
-import { getAllPortfolios } from "./repository/PortfoliosRepository";
+import {
+  getAllPortfolios,
+  updatePortfolio,
+} from "./repository/PortfoliosRepository";
 import { getAllTransactions } from "./repository/TransactionRepository";
 import { DONE, ERR, INFO, WARN } from "./utils/customLogs";
 
@@ -55,13 +58,13 @@ const main = async () => {
           }
 
           // Si el fondo tiene SERIES_A, omitirlo ya que es una serie nueva
-          if (portfolioFund?.series === "SERIES_A") {
+          /* if (portfolioFund?.series === "SERIES_A") {
             console.log(
               INFO,
               `Skipping fund ${portfolioFund?.id} with SERIES_A (new series)`
             );
             return portfolioFund;
-          }
+          } */
 
           // SERIES_O === NO_SERIES - considerar equivalencia para transacciones antiguas
           const fundTransactions = allTransactions.filter(({ fund }) => {
@@ -175,7 +178,7 @@ const main = async () => {
       };
 
       if (needUpdatePortfolio) {
-        // await updatePortfolio(newPortfolio as Portfolio);
+        // await updatePortfolio(newPortfolio);
         count++;
         console.log(DONE, `Updated portfolio ${currentPortfolio?.id}`);
       } else {

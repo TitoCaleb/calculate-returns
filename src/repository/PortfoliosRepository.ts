@@ -1,11 +1,15 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  DynamoDBDocumentClient,
+  ScanCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 import { config } from "../config";
 import { fromIni } from "@aws-sdk/credential-providers";
 
 const dynamoDbClient = DynamoDBDocumentClient.from(
   new DynamoDBClient({
-    credentials: fromIni({ profile: "blum" }),
+    // credentials: fromIni({ profile: "blum" }),
   }),
   {
     marshallOptions: {
@@ -42,4 +46,16 @@ export const getAllPortfolios = async () => {
   } while (lastEvaluatedKey);
 
   return portfolios;
+};
+
+export const updatePortfolio = async (portfolio: any) => {
+  await dynamoDbClient.send(
+    new UpdateCommand({
+      TableName: `PortfolioDb${config.env}`,
+      Key: { customerId: portfolio.customerId, id: portfolio.id },
+      UpdateExpression: "set #funds = :funds",
+      ExpressionAttributeNames: { "#funds": "funds" },
+      ExpressionAttributeValues: { ":funds": portfolio.funds },
+    })
+  );
 };

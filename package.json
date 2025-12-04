@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "co:login": "aws codeartifact login --tool npm --repository theshire --domain rivendell --profile blum"
+    "co:login": "aws codeartifact login --tool npm --repository theshire --domain rivendell --profile blum",
+    "start": "ts-node src/index.ts"
   },
   "keywords": [],
   "author": "",

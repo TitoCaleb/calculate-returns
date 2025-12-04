@@ -5,7 +5,7 @@ import { fromIni } from "@aws-sdk/credential-providers";
 
 const dynamoDbClient = DynamoDBDocumentClient.from(
   new DynamoDBClient({
-    credentials: fromIni({ profile: "blum" }),
+    // credentials: fromIni({ profile: "blum" }),
   }),
   {
     marshallOptions: {
